@@ -10,39 +10,27 @@ def read_data(data_path, split = "train"):
 	""" Read data """
 
 	# Fixed params
-	n_class = 6
-	n_steps = 128
+	n_class = 5
+	n_steps = 3000
 
 	# Paths
 	path_ = os.path.join(data_path, split)
-	path_signals = os.path.join(path_, "Inertial_Signals")
+	path_signals = os.path.join(path_, "raw")
 
 	# Read labels and one-hot encode
-	label_path = os.path.join(path_, "y_" + split + ".txt")
+	label_path = os.path.join(path_, "y_train.csv")
 	labels = pd.read_csv(label_path, header = None)
 
 	# Read time-series data
-	channel_files = os.listdir(path_signals)
-	n_channels = len(channel_files)
-	posix = len(split) + 5
 
 	# Initiate array
-	list_of_channels = []
-	X = np.zeros((len(labels), n_steps, n_channels))
-	i_ch = 0
-	for fil_ch in channel_files:
-		channel_name = fil_ch[:-posix]
-		dat_ = pd.read_csv(os.path.join(path_signals,fil_ch), delim_whitespace = True, header = None)
-		X[:,:,i_ch] = dat_.as_matrix()
-
-		# Record names
-		list_of_channels.append(channel_name)
-
-		# iterate
-		i_ch += 1
+	X = np.zeros((len(labels), n_steps))
+	dat_ = pd.read_csv(os.path.join(path_signals,"xb_res.txt"), sep = ',', delim_whitespace = False, header = None)
+	Raw = np.zeros((len(dat_.as_matrix()),n_steps))
+	X[:,:]= dat_.as_matrix()
 
 	# Return 
-	return X, labels[0].values, list_of_channels
+	return X, labels[0].values
 
 def standardize(train, test):
 	""" Standardize data """
@@ -51,7 +39,7 @@ def standardize(train, test):
 	assert np.allclose(all_data[len(train):], test), "Wrong test set!"
 
 	# Standardise each channel
-	all_data = (all_data - np.mean(all_data, axis=1)[:,None,:]) / np.std(all_data, axis=1)[:,None,:]
+	all_data = (all_data - np.mean(all_data, axis=1)[:,None]) / np.std(all_data, axis=1)[:,None]
 
 	# Split back and return
 	X_train = all_data[:len(train)]
