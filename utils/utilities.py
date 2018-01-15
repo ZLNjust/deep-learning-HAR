@@ -24,10 +24,10 @@ def read_data(data_path, split = "train"):
 	# Read time-series data
 
 	# Initiate array
-	X = np.zeros((len(labels), n_steps))
+	X = np.zeros((len(labels), n_steps,1))
 	dat_ = pd.read_csv(os.path.join(path_signals,"xb_res.txt"), sep = ',', delim_whitespace = False, header = None)
 	Raw = np.zeros((len(dat_.as_matrix()),n_steps))
-	X[:,:]= dat_.as_matrix()
+	X[:,:,0]= dat_.as_matrix()
 
 	# Return 
 	return X, labels[0].values
